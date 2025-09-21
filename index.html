@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberShield - Advanced Security Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #0066ff;
+            --secondary-color: #1a1a2e;
+            --accent-color: #e94560;
+            --success-color: #00d084;
+            --warning-color: #ff8c42;
+            --danger-color: #e74c3c;
+            --bg-primary: #0f0f23;
+            --bg-secondary: #16213e;
+            --bg-tertiary: #0e3460;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b9c8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --shadow-primary: 0 4px 20px rgba(0, 102, 255, 0.15);
+            --shadow-secondary: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --glow-primary: 0 0 20px rgba(0, 102, 255, 0.5);
+            --glow-danger: 0 0 20px rgba(231, 76, 60, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(0, 102, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(233, 69, 96, 0.1) 0%, transparent 50%),
+                linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.02) 50%, transparent 70%);
+            animation: float 20s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(-20px, -20px) rotate(1deg); }
+            66% { transform: translate(20px, 20px) rotate(-1deg); }
+        }
+
+        /* Header */
+        .header {
+            background: rgba(22, 33, 62, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--success-color);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(0, 208, 132, 0.1);
+            border: 1px solid rgba(0, 208, 132, 0.3);
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success-color);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+        }
+
+        /* Main Dashboard */
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: auto auto 1fr;
+            gap: 2rem;
+            min-height: calc(100vh - 100px);
+        }
+
+        /* Alert Bar */
+        .alert-bar {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(255, 140, 66, 0.1));
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .alert-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--danger-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .alert-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-primary);
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(22, 33, 62, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-secondary);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0, 102, 255, 0.5);
+            box-shadow: var(--shadow-primary), var(--shadow-secondary);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-menu {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .card-menu:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        /* Traffic Chart */
+        .traffic-chart {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 1rem 0;
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+        }
+
+        /* Threat Map */
+        .threat-map {
+            grid-column: 1;
+            grid-row: 3;
+        }
+
+        .map-container {
+            position: relative;
+            height: 400px;
+            background: rgba(14, 52, 96, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .map-canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Side Panels */
+        .threats-panel {
+            grid-column: 2;
+            grid-row: 2 / 4;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value.high { color: var(--danger-color); }
+        .metric-value.medium { color: var(--warning-color); }
+        .metric-value.low { color: var(--success-color); }
+        .metric-value.primary { color: var(--primary-color); }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Threat List */
+        .threat-list {
+            flex: 1;
+        }
+
+        .threat-items {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .threat-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .threat-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .threat-item.high::before { background: var(--danger-color); }
+        .threat-item.medium::before { background: var(--warning-color); }
+        .threat-item.low::before { background: var(--success-color); }
+
+        .threat-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(4px);
+        }
+
+        .threat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .threat-type {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .threat-severity {
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .threat-severity.high {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--danger-color);
+        }
+
+        .threat-severity.medium {
+            background: rgba(255, 140, 66, 0.2);
+            color: var(--warning-color);
+        }
+
+        .threat-severity.low {
+            background: rgba(0, 208, 132, 0.2);
+            color: var(--success-color);
+        }
+
+        .threat-description {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .threat-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Scrollbar Styling */
+        .threat-items::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .threat-items::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .threat-items::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .threat-item {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        /* Loading Animation */
+        .loading-indicator {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto auto;
+            }
+            
+            .threats-panel {
+                grid-column: 1;
+                grid-row: 4;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .header-stats {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            
+            .dashboard {
+                padding: 1rem;
+                gap: 1rem;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .alert-bar {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🛡️</div>
+                <div class="logo-text">CyberShield</div>
+            </div>
+            
+            <div class="header-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalThreats">847</div>
+                    <div class="stat-label">Total Threats</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="blockedToday">23</div>
+                    <div class="stat-label">Blocked Today</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="uptime">99.9%</div>
+                    <div class="stat-label">System Uptime</div>
+                </div>
+                
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>All Systems Operational</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="dashboard">
+        <!-- Alert Bar -->
+        <div class="alert-bar">
+            <div class="alert-icon">!</div>
+            <div class="alert-content">
+                <div class="alert-title">High Priority Alert: Suspicious Activity Detected</div>
+                <div class="alert-description">Multiple failed login attempts from IP 192.168.1.100 - Potential brute force attack</div>
+            </div>
+            <div class="alert-actions">
+                <button class="btn btn-primary">Investigate</button>
+                <button class="btn btn-secondary">Dismiss</button>
+            </div>
+        </div>
+
+        <!-- Traffic Chart -->
+        <div class="card traffic-chart">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="card-icon">📊</div>
+                    Network Traffic Monitor
+                </div>
+                <button class="card-menu">⋯</button>
+            </div>
+            <div class="chart-container">
+                <canvas class="chart-canvas" id="trafficChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Threat Map -->
+        <div class="card threat-map">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="card-icon">🌍</div>
+                    Global Threat Map
+                </div>
+                <button class="card-menu">⋯</button>
+            </div>
+            <div class="map-container">
+                <canvas class="map-canvas" id="threatMapCanvas"></canvas>
+            </div>
+        </div>
+
+        <!-- Side Panel -->
+        <div class="threats-panel">
+            <!-- Metrics -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon">⚡</div>
+                        Live Metrics
+                    </div>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value high" id="highThreats">12</div>
+                        <div class="metric-label">High Risk</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value medium" id="mediumThreats">34</div>
+                        <div class="metric-label">Medium Risk</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value low" id="lowThreats">89</div>
+                        <div class="metric-label">Low Risk</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value primary" id="avgResponse">1.2s</div>
+                        <div class="metric-label">Avg Response</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Threat List -->
+            <div class="card threat-list">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon">🚨</div>
+                        Active Threats
+                    </div>
+                    <button class="card-menu">⋯</button>
+                </div>
+                <div class="threat-items" id="threatItems">
+                    <!-- Threats will be populated here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        class CyberSecurityDashboard {
+            constructor() {
+                this.trafficData = [];
+                this.threatData = [];
+                this.maxDataPoints = 50;
+                this.animationFrame = null;
+                this.isRunning = false;
+                
+                this.threats = [
+                    {
+                        id: 1,
+                        type: 'DDoS Attack',
+                        severity: 'high',
+                        source: '185.220.100.240',
+                        target: 'Web Server',
+                        description: 'Volumetric attack targeting main web server',
+                        timestamp: Date.now() - 300000,
+                        location: { x: 0.15, y: 0.3 }
+                    },
+                    {
+                        id: 2,
+                        type: 'Malware Detection',
+                        severity: 'medium',
+                        source: '192.168.1.45',
+                        target: 'Endpoint',
+                        description: 'Suspicious file execution detected',
+                        timestamp: Date.now() - 180000,
+                        location: { x: 0.7, y: 0.25 }
+                    },
+                    {
+                        id: 3,
+                        type: 'Port Scan',
+                        severity: 'low',
+                        source: '203.0.113.100',
+                        target: 'Firewall',
+                        description: 'Automated port scanning activity',
+                        timestamp: Date.now() - 120000,
+                        location: { x: 0.45, y: 0.6 }
+                    },
+                    {
+                        id: 4,
+                        type: 'Data Breach Attempt',
+                        severity: 'high',
+                        source: '198.51.100.50',
+                        target: 'Database',
+                        description: 'Unauthorized access attempt to customer database',
+                        timestamp: Date.now() - 60000,
+                        location: { x: 0.65, y: 0.4 }
+                    },
+                    {
+                        id: 5,
+                        type: 'Phishing Email',
+                        severity: 'medium',
+                        source: 'external',
+                        target: 'Email Gateway',
+                        description: 'Malicious email blocked by security filter',
+                        timestamp: Date.now() - 30000,
+                        location: { x: 0.8, y: 0.35 }
+                    }
+                ];
+                
+                this.init();
+            }
+
+            init() {
+                this.setupCanvases();
+                this.generateInitialData();
+                this.renderThreats();
+                this.startRealTimeUpdates();
+                this.start();
+            }
+
+            setupCanvases() {
+                this.trafficCanvas = document.getElementById('trafficChart');
+                this.mapCanvas = document.getElementById('threatMapCanvas');
+                
+                this.trafficCtx = this.trafficCanvas.getContext('2d');
+                this.mapCtx = this.mapCanvas.getContext('2d');
+                
+                this.resizeCanvases();
+                window.addEventListener('resize', () => this.resizeCanvases());
+            }
+
+            resizeCanvases() {
+                [this.trafficCanvas, this.mapCanvas].forEach(canvas => {
+                    const rect = canvas.getBoundingClientRect();
+                    canvas.width = rect.width * window.devicePixelRatio;
+                    canvas.height = rect.height * window.devicePixelRatio;
+                    canvas.getContext('2d').scale(window.devicePixelRatio, window.devicePixelRatio);
+                });
+            }
+
+            generateInitialData() {
+                const now = Date.now();
+                for (let i = 0; i < this.maxDataPoints; i++) {
+                    const timestamp = now - (this.maxDataPoints - i) * 2000;
+                    const baseTraffic = 45 + Math.sin(i * 0.1) * 15;
+                    const spike = Math.random() < 0.05 ? Math.random() * 80 : 0;
+                    const noise = (Math.random() - 0.5) * 20;
+                    const volume = Math.max(0, Math.round(baseTraffic + spike + noise));
+                    
+                    this.trafficData.push({ timestamp, volume });
+                }
+            }
+
+            updateTrafficData() {
+                const baseTraffic = 50 + Math.sin(Date.now() * 0.001) * 20;
+                const spike = Math.random() < 0.08 ? Math.random() * 120 : 0;
+                const noise = (Math.random() - 0.5) * 25;
+                const volume = Math.max(0, Math.round(baseTraffic + spike + noise));
+                
+                this.trafficData.push({
+                    timestamp: Date.now(),
+                    volume: volume
+                });
+                
+                if (this.trafficData.length > this.maxDataPoints) {
+                    this.trafficData.shift();
+                }
+                
+                // Update metrics
+                if (Math.random() < 0.1) {
+                    this.updateMetrics();
+                }
+            }
+
+            updateMetrics() {
+                const elements = {
+                    totalThreats: () => Math.floor(Math.random() * 50) + 800,
+                    blockedToday: () => Math.floor(Math.random() * 10) + 20,
+                    highThreats: () => Math.floor(Math.random() * 5) + 10,
+                    mediumThreats: () => Math.floor(Math.random() * 10) + 30,
+                    lowThreats: () => Math.floor(Math.random() * 20) + 80,
+                    avgResponse: () => (Math.random() * 2 + 0.8).toFixed(1) + 's'
+                };
+                
+                Object.entries(elements).forEach(([id, generator]) => {
+                    const element = document.getElementById(id);
+                    if (element && Math.random() < 0.3) {
+                        element.textContent = generator();
+                    }
+                });
+            }
+
+            drawTrafficChart() {
+                const canvas = this.trafficCanvas;
+                const ctx = this.trafficCtx;
+                const rect = canvas.getBoundingClientRect();
+                const width = rect.width;
+                const height = rect.height;
+                
+                ctx.clearRect(0, 0, width, height);
+                
+                if (this.trafficData.length === 0) return;
+                
+                // Background
+                const gradient = ctx.createLinearGradient(0, 0, 0, height);
+                gradient.addColorStop(0, 'rgba(14, 52, 96, 0.6)');
+                gradient.addColorStop(1, 'rgba(22, 33, 62, 0.8)');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, width, height);
+                
+                // Grid lines
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.lineWidth = 1;
+                const gridLines = 6;
+                for (let i = 0; i <= gridLines; i++) {
+                    const y = (height - 40) * (i / gridLines) + 20;
+                    ctx.beginPath();
+                    ctx.moveTo(30, y);
+                    ctx.lineTo(width - 30, y);
+                    ctx.stroke();
+                }
+                
+                // Baseline
+                const baseline = 50;
+                const maxVolume = Math.max(...this.trafficData.map(d => d.volume), 150);
+                const baselineY = height - 40 - ((baseline / maxVolume) * (height - 60));
+                
+                ctx.strokeStyle = 'rgba(0, 102, 255, 0.6)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(30, baselineY);
+                ctx.lineTo(width - 30, baselineY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Area fill
+                const areaGradient = ctx.createLinearGradient(0, height - 40, 0, 20);
+                areaGradient.addColorStop(0, 'rgba(0, 102, 255, 0.1)');
+                areaGradient.addColorStop(1, 'rgba(0, 102, 255, 0.3)');
+                
+                ctx.beginPath();
+                ctx.moveTo(30, height - 40);
+                
+                this.trafficData.forEach((data, index) => {
+                    const x = 30 + (index / (this.trafficData.length - 1)) * (width - 60);
+                    const y = height - 40 - ((data.volume / maxVolume) * (height - 60));
+                    
+                    if (index === 0) {
+                        ctx.lineTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+                
+                ctx.lineTo(width - 30, height - 40);
+                ctx.fillStyle = areaGradient;
+                ctx.fill();
+                
+                // Traffic line
+                ctx.strokeStyle = '#0066ff';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                
+                this.trafficData.forEach((data, index) => {
+                    const x = 30 + (index / (this.trafficData.length - 1)) * (width - 60);
+                    const y = height - 40 - ((data.volume / maxVolume) * (height - 60));
+                    
+                    if (index === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+                ctx.stroke();
+                
+                // Data points
+                this.trafficData.forEach((data, index) => {
+                    if (index % 5 === 0) { // Show every 5th point
+                        const x = 30 + (index / (this.trafficData.length - 1)) * (width - 60);
+                        const y = height - 40 - ((data.volume / maxVolume) * (height - 60));
+                        
+                        ctx.beginPath();
+                        ctx.arc(x, y, 4, 0, Math.PI * 2);
+                        ctx.fillStyle = '#0066ff';
+                        ctx.fill();
+                        ctx.strokeStyle = '#ffffff';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                });
+                
+                // Current value highlight
+                if (this.trafficData.length > 0) {
+                    const current = this.trafficData[this.trafficData.length - 1];
+                    const x = width - 30;
+                    const y = height - 40 - ((current.volume / maxVolume) * (height - 60));
+                    
+                    // Pulsing effect
+                    const pulseRadius = 8 + Math.sin(Date.now() * 0.005) * 3;
+                    ctx.beginPath();
+                    ctx.arc(x, y, pulseRadius, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(0, 102, 255, 0.3)';
+                    ctx.fill();
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, 6, 0, Math.PI * 2);
+                    ctx.fillStyle = '#0066ff';
+                    ctx.fill();
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+                
+                // Labels
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.font = '12px Segoe UI';
+                ctx.fillText('Traffic (req/min)', 30, 15);
+                ctx.fillText(`Baseline: ${baseline}`, 30, height - 5);
+                
+                if (this.trafficData.length > 0) {
+                    const current = this.trafficData[this.trafficData.length - 1];
+                    ctx.fillText(`Current: ${current.volume}`, width - 150, height - 5);
+                }
+            }
+
+            drawThreatMap() {
+                const canvas = this.mapCanvas;
+                const ctx = this.mapCtx;
+                const rect = canvas.getBoundingClientRect();
+                const width = rect.width;
+                const height = rect.height;
+                
+                ctx.clearRect(0, 0, width, height);
+                
+                // Background
+                const bgGradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, Math.max(width, height)/2);
+                bgGradient.addColorStop(0, 'rgba(14, 52, 96, 0.8)');
+                bgGradient.addColorStop(1, 'rgba(22, 33, 62, 0.9)');
+                ctx.fillStyle = bgGradient;
+                ctx.fillRect(0, 0, width, height);
+                
+                // World map (simplified continents)
+                this.drawWorldMap(ctx, width, height);
+                
+                // Threat indicators
+                this.drawThreatIndicators(ctx, width, height);
+                
+                // Legend
+                this.drawMapLegend(ctx, width, height);
+                
+                // Connection lines (for active threats)
+                this.drawThreatConnections(ctx, width, height);
+            }
+
+            drawWorldMap(ctx, width, height) {
+                const continents = [
+                    { name: 'North America', x: width * 0.2, y: height * 0.35, w: width * 0.15, h: height * 0.25 },
+                    { name: 'South America', x: width * 0.25, y: height * 0.65, w: width * 0.1, h: height * 0.2 },
+                    { name: 'Europe', x: width * 0.45, y: height * 0.25, w: width * 0.12, h: height * 0.15 },
+                    { name: 'Africa', x: width * 0.5, y: height * 0.55, w: width * 0.15, h: height * 0.25 },
+                    { name: 'Asia', x: width * 0.65, y: height * 0.35, w: width * 0.2, h: height * 0.25 },
+                    { name: 'Australia', x: width * 0.75, y: height * 0.7, w: width * 0.12, h: height * 0.1 }
+                ];
+                
+                ctx.fillStyle = 'rgba(100, 200, 100, 0.15)';
+                ctx.strokeStyle = 'rgba(100, 200, 100, 0.4)';
+                ctx.lineWidth = 1;
+                
+                continents.forEach(continent => {
+                    ctx.beginPath();
+                    ctx.ellipse(continent.x, continent.y, continent.w/2, continent.h/2, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                });
+            }
+
+            drawThreatIndicators(ctx, width, height) {
+                const colors = {
+                    high: '#e74c3c',
+                    medium: '#ff8c42',
+                    low: '#00d084'
+                };
+                
+                this.threats.forEach((threat, index) => {
+                    const x = width * threat.location.x;
+                    const y = height * threat.location.y;
+                    const color = colors[threat.severity];
+                    const baseRadius = threat.severity === 'high' ? 10 : threat.severity === 'medium' ? 8 : 6;
+                    
+                    // Animated pulse effect
+                    const time = Date.now() * 0.003;
+                    const pulseRadius = baseRadius + 6 + Math.sin(time + index * 0.5) * 4;
+                    
+                    // Outer pulse
+                    ctx.beginPath();
+                    ctx.arc(x, y, pulseRadius, 0, Math.PI * 2);
+                    ctx.fillStyle = color + '20';
+                    ctx.fill();
+                    
+                    // Middle ring
+                    ctx.beginPath();
+                    ctx.arc(x, y, baseRadius + 3, 0, Math.PI * 2);
+                    ctx.fillStyle = color + '40';
+                    ctx.fill();
+                    
+                    // Core indicator
+                    ctx.beginPath();
+                    ctx.arc(x, y, baseRadius, 0, Math.PI * 2);
+                    ctx.fillStyle = color;
+                    ctx.fill();
+                    
+                    // White border
+                    ctx.beginPath();
+                    ctx.arc(x, y, baseRadius, 0, Math.PI * 2);
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    
+                    // Severity indicator
+                    if (threat.severity === 'high') {
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = 'bold 8px Segoe UI';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('!', x, y + 3);
+                    }
+                });
+            }
+
+            drawThreatConnections(ctx, width, height) {
+                const centerX = width * 0.5;
+                const centerY = height * 0.5;
+                
+                ctx.strokeStyle = 'rgba(231, 76, 60, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([3, 3]);
+                
+                this.threats.forEach((threat, index) => {
+                    if (threat.severity === 'high') {
+                        const x = width * threat.location.x;
+                        const y = height * threat.location.y;
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(centerX, centerY);
+                        ctx.lineTo(x, y);
+                        ctx.stroke();
+                    }
+                });
+                
+                ctx.setLineDash([]);
+            }
+
+            drawMapLegend(ctx, width, height) {
+                const legendItems = [
+                    { color: '#e74c3c', label: 'High Risk', count: 2 },
+                    { color: '#ff8c42', label: 'Medium Risk', count: 2 },
+                    { color: '#00d084', label: 'Low Risk', count: 1 }
+                ];
+                
+                ctx.font = '12px Segoe UI';
+                ctx.textAlign = 'left';
+                
+                legendItems.forEach((item, index) => {
+                    const x = width - 150;
+                    const y = height - 80 + index * 25;
+                    
+                    // Legend color circle
+                    ctx.beginPath();
+                    ctx.arc(x, y, 8, 0, Math.PI * 2);
+                    ctx.fillStyle = item.color;
+                    ctx.fill();
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    
+                    // Legend text
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                    ctx.fillText(`${item.label} (${item.count})`, x + 20, y + 4);
+                });
+                
+                // Legend title
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                ctx.font = 'bold 14px Segoe UI';
+                ctx.fillText('Threat Levels', width - 150, height - 100);
+            }
+
+            renderThreats() {
+                const container = document.getElementById('threatItems');
+                container.innerHTML = '';
+                
+                // Sort threats by severity and timestamp
+                const sortedThreats = [...this.threats].sort((a, b) => {
+                    const severityOrder = { high: 3, medium: 2, low: 1 };
+                    if (severityOrder[a.severity] !== severityOrder[b.severity]) {
+                        return severityOrder[b.severity] - severityOrder[a.severity];
+                    }
+                    return b.timestamp - a.timestamp;
+                });
+                
+                sortedThreats.forEach((threat, index) => {
+                    const threatElement = document.createElement('div');
+                    threatElement.className = `threat-item ${threat.severity}`;
+                    threatElement.style.animationDelay = `${index * 0.1}s`;
+                    
+                    const timeAgo = this.formatTimeAgo(Date.now() - threat.timestamp);
+                    
+                    threatElement.innerHTML = `
+                        <div class="threat-header">
+                            <div class="threat-type">${threat.type}</div>
+                            <div class="threat-severity ${threat.severity}">${threat.severity}</div>
+                        </div>
+                        <div class="threat-description">${threat.description}</div>
+                        <div class="threat-meta">
+                            <span>Source: ${threat.source}</span>
+                            <span>${timeAgo}</span>
+                        </div>
+                    `;
+                    
+                    container.appendChild(threatElement);
+                });
+            }
+
+            formatTimeAgo(ms) {
+                const seconds = Math.floor(ms / 1000);
+                const minutes = Math.floor(seconds / 60);
+                const hours = Math.floor(minutes / 60);
+                
+                if (hours > 0) return `${hours}h ago`;
+                if (minutes > 0) return `${minutes}m ago`;
+                return `${seconds}s ago`;
+            }
+
+            simulateNewThreat() {
+                if (Math.random() < 0.1) { // 10% chance every update
+                    const threatTypes = [
+                        'Suspicious Login', 'Malware Detected', 'Unusual Network Activity', 
+                        'Failed Authentication', 'Data Exfiltration Attempt', 'SQL Injection'
+                    ];
+                    
+                    const severities = ['low', 'medium', 'high'];
+                    const sources = ['192.168.1.', '10.0.0.', '203.0.113.', '198.51.100.'];
+                    
+                    const newThreat = {
+                        id: Date.now(),
+                        type: threatTypes[Math.floor(Math.random() * threatTypes.length)],
+                        severity: severities[Math.floor(Math.random() * severities.length)],
+                        source: sources[Math.floor(Math.random() * sources.length)] + Math.floor(Math.random() * 255),
+                        target: 'System',
+                        description: 'Automated threat detection triggered',
+                        timestamp: Date.now(),
+                        location: {
+                            x: Math.random() * 0.8 + 0.1,
+                            y: Math.random() * 0.6 + 0.2
+                        }
+                    };
+                    
+                    this.threats.unshift(newThreat);
+                    if (this.threats.length > 10) {
+                        this.threats.pop();
+                    }
+                    
+                    this.renderThreats();
+                    
+                    // Update alert bar occasionally
+                    if (newThreat.severity === 'high' && Math.random() < 0.3) {
+                        this.updateAlertBar(newThreat);
+                    }
+                }
+            }
+
+            updateAlertBar(threat) {
+                const alertBar = document.querySelector('.alert-bar');
+                const alertTitle = alertBar.querySelector('.alert-title');
+                const alertDescription = alertBar.querySelector('.alert-description');
+                
+                alertTitle.textContent = `High Priority Alert: ${threat.type} Detected`;
+                alertDescription.textContent = `${threat.description} - Source: ${threat.source}`;
+                
+                // Add animation
+                alertBar.style.animation = 'none';
+                setTimeout(() => {
+                    alertBar.style.animation = 'slideIn 0.5s ease-out';
+                }, 10);
+            }
+
+            startRealTimeUpdates() {
+                setInterval(() => {
+                    this.updateTrafficData();
+                    this.simulateNewThreat();
+                }, 2000);
+                
+                // Update metrics more frequently
+                setInterval(() => {
+                    this.updateMetrics();
+                }, 5000);
+            }
+
+            start() {
+                this.isRunning = true;
+                this.animate();
+            }
+
+            stop() {
+                this.isRunning = false;
+                if (this.animationFrame) {
+                    cancelAnimationFrame(this.animationFrame);
+                }
+            }
+
+            animate() {
+                if (!this.isRunning) return;
+                
+                this.drawTrafficChart();
+                this.drawThreatMap();
+                
+                this.animationFrame = requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // Initialize dashboard when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            const dashboard = new CyberSecurityDashboard();
+            
+            // Add event listeners for interactive elements
+            document.querySelector('.alert-bar .btn-primary').addEventListener('click', () => {
+                alert('Opening threat investigation panel...');
+            });
+            
+            document.querySelector('.alert-bar .btn-secondary').addEventListener('click', () => {
+                document.querySelector('.alert-bar').style.display = 'none';
+            });
+            
+            // Add card menu interactions
+            document.querySelectorAll('.card-menu').forEach(menu => {
+                menu.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // In a real app, this would show a context menu
+                    console.log('Card menu clicked');
+                });
+            });
+            
+            // Simulate system status changes
+            setInterval(() => {
+                const statusIndicator = document.querySelector('.status-indicator');
+                const statusDot = document.querySelector('.status-dot');
+                const statusText = statusIndicator.querySelector('span');
+                
+                if (Math.random() < 0.05) { // 5% chance of status change
+                    const statuses = [
+                        { text: 'All Systems Operational', class: 'status-dot', color: '#00d084' },
+                        { text: 'Minor Issues Detected', class: 'status-dot', color: '#ff8c42' },
+                        { text: 'System Under Attack', class: 'status-dot', color: '#e74c3c' }
+                    ];
+                    
+                    const status = statuses[Math.floor(Math.random() * statuses.length)];
+                    statusText.textContent = status.text;
+                    statusDot.style.background = status.color;
+                    
+                    // Reset to normal after some time
+                    setTimeout(() => {
+                        statusText.textContent = 'All Systems Operational';
+                        statusDot.style.background = '#00d084';
+                    }, 10000);
+                }
+            }, 30000);
+        });
+    </script>
+</body>
+</html>
